@@ -1,0 +1,27 @@
+plugins {
+    id 'application'
+}
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(25) }
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation project(':engine')
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['--add-modules', 'jdk.incubator.vector']
+}
+
+application {
+    mainClass = 'dev.apurva.llm.server.LlmServer'
+    applicationDefaultJvmArgs = ['--add-modules=jdk.incubator.vector']
+}
+
+// `gradle :server:run --args="--model ../models/tinyllama-15M --port 8080"`
+tasks.named('run') { workingDir = rootProject.projectDir }

@@ -1,0 +1,27 @@
+plugins {
+    id 'application'
+}
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(25) }
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation project(':engine')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['--add-modules', 'jdk.incubator.vector']
+}
+
+application {
+    mainClass = 'dev.apurva.llm.cli.Main'
+    applicationDefaultJvmArgs = ['--add-modules=jdk.incubator.vector']
+}
+
+tasks.named('run') {
+    workingDir = rootProject.projectDir
+    standardInput = System.in
+}

@@ -1,0 +1,11 @@
+{
+  "prompt": "Once upon a time there was a small dragon.",
+  "shape": [
+    1,
+    12,
+    32000
+  ],
+  "dtype": "float32",
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0"
+}

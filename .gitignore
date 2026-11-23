@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Java
+*.class
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Python
+.venv/
+python/.venv/
+__pycache__/
+*.pyc
+
+# Models
+models/*
+!models/README.md
+
+# Generated reference fixtures (optional)
+python/reference.json

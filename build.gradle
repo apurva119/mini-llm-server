@@ -1,0 +1,5 @@
+// Root build: shared settings only. See engine/, server/, cli/ for module builds.
+allprojects {
+    group = 'dev.apurva.llm'
+    version = '0.1.0'
+}
