@@ -122,18 +122,26 @@ public final class LlmServer {
         LlmServer app = new LlmServer(new Generator(model, tokenizer),
                 concurrent, queue, queueTimeoutMs, requestTimeoutMs);
 
-        HttpServer http = HttpServer.create(new InetSocketAddress(port), 0);
-        http.createContext("/health", safe(app::health));
-        http.createContext("/v1/model", safe(app::modelInfo));
-        http.createContext("/v1/stats", safe(app::stats));
-        http.createContext("/v1/generate", safe(app::generate));
-        http.createContext("/v1/chat/completions", safe(app::chatCompletions));
-        http.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
-        http.start();
+        app.start(new InetSocketAddress(port));
         System.err.println("Listening on http://localhost:" + port
                 + " (concurrency=" + concurrent + ", queue=" + queue + ")");
     }
 
+    /**
+     * Starts the HTTP API on the supplied address.
+     * Port 0 lets the operating system select an available port.
+     */
+    public HttpServer start(InetSocketAddress address) throws IOException {
+        HttpServer http = HttpServer.create(address, 0);
+        http.createContext("/health", safe(this::health));
+        http.createContext("/v1/model", safe(this::modelInfo));
+        http.createContext("/v1/stats", safe(this::stats));
+        http.createContext("/v1/generate", safe(this::generate));
+        http.createContext("/v1/chat/completions", safe(this::chatCompletions));
+        http.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+        http.start();
+        return http;
+    }
     // ---- handlers ------------------------------------------------------------
 
     private void health(HttpExchange ex) throws IOException {
