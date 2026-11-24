@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.apurva.llm.engine.layers.Transformer;
 import dev.apurva.llm.engine.runtime.InferenceState;
 import dev.apurva.llm.engine.tokenizer.Tokenizer;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,17 +19,27 @@ public class ReferenceComparisonTest {
     void compareAgainstReference() throws Exception {
 
         Path modelDir = Path.of("../models/tinyllama-15M").normalize();
+        Path reference = Path.of("../python/reference.json").normalize();
+
+        // Skip this test if the large model or reference fixture isn't present.
+        Assumptions.assumeTrue(
+                Files.exists(modelDir.resolve("model.safetensors")),
+                "Reference model not available"
+        );
+
+        Assumptions.assumeTrue(
+                Files.exists(reference),
+                "Reference logits not available"
+        );
 
         Transformer model = Transformer.load(modelDir);
         Tokenizer tokenizer = Tokenizer.load(modelDir);
 
-        // Ensure tokenizer loads correctly
+        // Ensure tokenizer loads correctly.
         assertTrue(tokenizer.vocabSize() > 0);
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(
-    Path.of("../python/reference.json").normalize().toFile()
-);
+        JsonNode root = mapper.readTree(reference.toFile());
 
         JsonNode ids = root.get("input_ids");
         JsonNode refLogits = root.get("logits");
@@ -52,9 +64,7 @@ public class ReferenceComparisonTest {
             double ref = refLogits.get(i).asDouble();
             double err = Math.abs(logits[i] - ref);
 
-            if (err > maxErr)
-                maxErr = err;
-
+            maxErr = Math.max(maxErr, err);
             mse += err * err;
         }
 
