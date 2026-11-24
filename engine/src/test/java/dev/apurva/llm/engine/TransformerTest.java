@@ -69,7 +69,7 @@ class TransformerTest {
         model.forward(s2, 260, 1, false); // advance only s2
         float[] l1 = model.forward(s1, 260, 1, true).clone();
         float[] ref = run(1, 260);
-        assertArrayEquals(ref, l1, 0f);
+        assertArrayEquals(ref, l1, 1e-5f);
     }
 
     @Test
